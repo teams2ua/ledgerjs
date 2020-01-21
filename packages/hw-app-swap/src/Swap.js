@@ -4,10 +4,11 @@ import type Transport from "@ledgerhq/hw-transport";
 const GET_VERSION_COMMAND: number           = 0x00;
 const START_NEW_TRANSACTION_COMMAND: number = 0x01;
 const SET_PARTNER_KEY_COMMAND: number       = 0x02;
-const PROCESS_TRANSACTION_RESPONSE: number  = 0x03;
-const CHECK_TRANSACTION_SIGNATURE: number   = 0x04;
-const CHECK_PAYOUT_ADDRESS:number           = 0x05;
-const CHECK_REFUND_ADDRESS:number           = 0x06;
+const CHECK_PARTNER_COMMAND: Number         = 0x03;
+const PROCESS_TRANSACTION_RESPONSE: number  = 0x04;
+const CHECK_TRANSACTION_SIGNATURE: number   = 0x05;
+const CHECK_PAYOUT_ADDRESS:number           = 0x06;
+const CHECK_REFUND_ADDRESS:number           = 0x07;
 
 export default class Swap {
   transport: Transport<*>;  
@@ -18,7 +19,7 @@ export default class Swap {
   }
 
   isSuccess(result: Buffer): bool {
-    return (result.length > 2) && (result.readUInt16BE(result.length - 2) == 0x9000);
+    return (result.length >= 2) && (result.readUInt16BE(result.length - 2) == 0x9000);
   }
 
   mapProtocolError(result: Buffer): void {
@@ -57,8 +58,14 @@ export default class Swap {
     return transactionId;
   }
 
-  async setPartnerKey(partnerNameAndPublicKeySigned: Buffer): Promise<void> {
-    let result: Buffer = await this.transport.send(0xE0, SET_PARTNER_KEY_COMMAND, 0x00, 0x00, partnerNameAndPublicKeySigned, this.allowedStatuses);
+  async setPartnerKey(partnerNameAndPublicKey: Buffer): Promise<void> {
+    let result: Buffer = await this.transport.send(0xE0, SET_PARTNER_KEY_COMMAND, 0x00, 0x00, partnerNameAndPublicKey, this.allowedStatuses);
+    if (!this.isSuccess(result))
+      this.mapProtocolError(result);
+  }
+
+  async checkPartner(signatureOfPartnerData: Buffer): Promise<void> {
+    let result: Buffer = await this.transport.send(0xE0, CHECK_PARTNER_COMMAND, 0x00, 0x00, signatureOfPartnerData, this.allowedStatuses);
     if (!this.isSuccess(result))
       this.mapProtocolError(result);
   }
