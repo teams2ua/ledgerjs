@@ -1,7 +1,7 @@
 //@flow
 import type Transport from "@ledgerhq/hw-transport";
 import { signMessage } from "./signMessage";
-import { getWalletPublicKey } from "./getWalletPublicKey";
+import { getWalletPublicKey, getSerializedAddressParameters } from "./getWalletPublicKey";
 import type { AddressFormat } from "./getWalletPublicKey";
 import { splitTransaction } from "./splitTransaction";
 import type { Transaction } from "./types";
@@ -27,6 +27,7 @@ export default class Btc {
     transport.decorateAppAPIMethods(
       this,
       [
+        "getSerializedAddressParameters",
         "getWalletPublicKey",
         "signP2SHTransaction",
         "signMessageNew",
@@ -34,6 +35,13 @@ export default class Btc {
       ],
       scrambleKey
     );
+  }
+
+  getSerializedAddressParameters(
+    path: string,
+    format?: AddressFormat
+  ): { addressParameters: Buffer } {
+    return getSerializedAddressParameters(path, format);
   }
 
   /**

@@ -13,6 +13,18 @@ const addressFormatMap = {
   bech32: 2
 };
 
+export function getSerializedAddressParameters(
+  path: string, format?: AddressFormat
+): {addressParameters: Buffer} {
+  format = format || "legacy";
+  if (!(format in addressFormatMap)) {
+    throw new Error("btc.getWalletPublicKey invalid format=" + format);
+  }
+  const buffer = bip32asBuffer(path);
+  const addressParameters = Buffer.concat([Buffer.from([addressFormatMap[format]]), buffer]);
+  return {addressParameters};
+}
+
 export async function getWalletPublicKey(
   transport: Transport<*>,
   options: { path: string, verify?: boolean, format?: AddressFormat }
