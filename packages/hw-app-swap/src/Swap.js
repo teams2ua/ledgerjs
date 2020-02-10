@@ -86,8 +86,8 @@ export default class Swap {
     if (payoutCurrencyConfig.length > 255) {
       throw new Error("Currency config is too big");
     }
-    if (currencyConfigSignature.length != 70) {
-      throw new Error("Signature should be DER serialized and have length of 70 bytes");
+    if (currencyConfigSignature.length < 70 || currencyConfigSignature.length > 73) {
+      throw new Error("Signature should be DER serialized and have length in [70, 73] bytes");
     }
     if (addressParameters.length > 255) {
       throw new Error("Address parameters is too big");
@@ -107,8 +107,8 @@ export default class Swap {
     if (refundCurrencyConfig.length > 255) {
       throw new Error("Currency config is too big");
     }
-    if (currencyConfigSignature.length != 70) {
-      throw new Error("Signature should be DER serialized and have length of 70 bytes");
+    if (currencyConfigSignature.length < 70 || currencyConfigSignature.length > 73) {
+      throw new Error("Signature should be DER serialized and have length in [70, 73] bytes");
     }
     if (addressParameters.length > 255) {
       throw new Error("Address parameters is too big");
